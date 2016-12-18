@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+	    http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+    <!-- 配置注解搜索的范围,该例子中spring会自动搜索com.fms.controller下面的注解 -->
+    <context:component-scan base-package="com.webDemo.controller">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+    
+
+
+ 	<!-- 激活spring的注解. -->
+    <context:annotation-config></context:annotation-config>
+   
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+       <!--  <property name="contentType" value="text/html"/> -->
+        <property name="prefix" value="/WEB-INF/page/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+    
+    <!--  <mvc:annotation-driven/> -->
+     
+     
+    <!-- 资源类组件以及扩展组件 ApplicationContext-->
+	<bean id="springContext" class="com.webDemo.utils.ApplicationContextUtil"></bean>
+     
+    <!-- 异常处理类 -->
+	<bean id="exceptionHandler" class="com.webDemo.exception.WebDemoExceptionHandler" />
+     
+    
+    <!-- 访问拦截
+    	测试单一功能 时可以先去掉
+     -->
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**/**" />
+			<bean class="com.webDemo.interceptors.LoginHandlerInterceptor">
+				<property name="excludeUrls"><!-- 放开拦截列表 -->
+					<list>
+						<value>sys/toLogin.html</value>
+						<value>sys/login.html</value>
+						<value>sys/checkuser.html</value>
+						<value>sys/logout.html</value>
+						<value>/checkcode.html</value>
+						<value>/</value>
+					</list>
+				</property>
+			</bean>
+		</mvc:interceptor>
+		<!--声明本地化变更拦截器-->
+		<mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+                <property name="paramName" value="language"/>
+            </bean>
+        </mvc:interceptor>
+	</mvc:interceptors>
+	
+	
+	
+	
+	<!-- json格式 -->
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+		<property name="ignoreDefaultModelOnRedirect" value="true"/>
+		<property name="messageConverters">
+			<list>
+				<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" />
+			</list>
+		</property>
+	</bean> 
+
+	<!-- <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<ref bean="mappingJacksonHttpMessageConverter" />
+			</list>
+		</property>
+	</bean>
+	<bean id="mappingJacksonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+		<property name="supportedMediaTypes">
+			<list>
+				<value>text/html;charset=UTF-8</value>
+			</list>
+		</property>
+	</bean> -->
+
+	 <!-- 开启注解 begin -->
+	 <!-- 避免IE执行AJAX时,返回JSON出现下载文件 -->
+	<bean id="mappingJackson2HttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+		<property name="supportedMediaTypes">
+			<list>
+				<value>text/html;charset=UTF-8</value>
+			</list>
+		</property>
+	</bean>
+	<!--注解方法处理 启动Spring MVC的注解功能，完成请求和注解POJO的映射 -->
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<ref bean="mappingJackson2HttpMessageConverter" /><!-- json转换器 -->
+			</list>
+		</property>
+	</bean>
+	<!-- 注解类映射处理 -->
+	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"></bean>
+	<!-- 开启注解 end -->
+
+	
+
+	<mvc:default-servlet-handler/>  
+    <!--静态资源访问(缓存一周) -->
+    <mvc:resources location="/resources/" mapping="/resources/**" />
+    <mvc:resources location="/images/" mapping="/images/**" cache-period="604800"/>
+    <mvc:resources location="/common/" mapping="/common/**" cache-period="604800"/>
+    <mvc:resources location="/css/" mapping="/css/**" cache-period="604800"/>
+    <mvc:resources location="/uploadFiles/" mapping="/uploadFiles/**" cache-period="604800"/>
+	
+    <!-- 配置springMVC处理上传文件的信息 -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding">
+			<value>UTF-8</value>
+		</property>
+		<!-- <property name="maxUploadSize">
+			<value>992505856</value>上传文件大小限制为31M，31*1024*1024
+		</property> -->
+		<property name="maxInMemorySize">
+			<value>4096</value>
+		</property>
+	</bean>
+
+
+
+	
+	
+	
+    <!-- 配置注解驱动的Spring MVC Controller 的编程模型.注:此标签只在 Servlet MVC工作! -->
+   <!--  <mvc:annotation-driven>
+        <mvc:message-converters register-defaults="true">
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>application/json;charset=UTF-8</value>
+                        <value>text/html;charset=UTF-8</value>
+                        <value>text/json;charset=UTF-8</value> 
+                    </list>
+                </property>
+                <property name="objectMapper">
+                    <bean class="com.fasterxml.jackson.databind.ObjectMapper">
+                        <property name="serializationInclusion">
+                            <value type="com.fasterxml.jackson.annotation.JsonInclude.Include">NON_NULL</value>
+                        </property>
+                        <property name="dateFormat">
+                            <bean class="java.text.SimpleDateFormat">
+                                <constructor-arg value="yyyy-MM-dd HH:mm:ss"/>
+                            </bean>
+                        </property>
+                    </bean>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven> -->
+
+	
+	 <!-- 开启shiro注解支持 -->
+    <!-- <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager" />
+    </bean> -->
+	   
+	
+	
+    <!-- 定义国际化消息-->
+    <!-- 其中basename用来指定properties文件的通用名,如实例中的messages_en.properties,messages_ja.properties通用名都是messages -->
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basename" value="messages/ApplicationResources"/>
+        <property name="useCodeAsDefaultMessage" value="true"/>
+        <property name="defaultEncoding" value="UTF-8"/>
+    </bean>
+
+    <!-- 配置基于Session的处理,将提交上来的locale参数进行处理 -->
+    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
+        <property name="cookieName" value="language"/>
+        <property name="cookieMaxAge" value="3600"/>
+        <property name="defaultLocale" value="zh_CN"/>
+    </bean>
+
+    <!-- 访问根目录时，跳转到首页(本项目在Controller中实现) -->
+    <!--<mvc:view-controller path="/" view-name="redirect:/main"/>-->
+    
+    
+</beans>

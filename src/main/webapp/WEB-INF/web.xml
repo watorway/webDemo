@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         version="2.5">
+    <display-name>webDemo</display-name>
+
+    <!-- 加载配置文件变量 -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+            classpath:spring/applicationContext-*.xml
+            classpath:mybatis/myBatis-Configuration.xml
+        </param-value>
+    </context-param>
+
+
+    <!--Spring 刷新Introspector防止内存泄露 ,应将它配置在 所有其他Listener的前面-->
+    <listener>
+        <listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
+    </listener>
+
+
+    <!-- Spring -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+
+    <context-param>
+        <param-name>webAppRootKey</param-name>
+        <param-value>webDemo.root</param-value>
+    </context-param>
+    <listener>
+        <listener-class>org.springframework.web.util.WebAppRootListener</listener-class>
+    </listener>
+
+
+    <!-- 系统初始化监听器
+        启动缓存功能...
+     -->
+    <listener>
+        <listener-class>com.webDemo.listener.SystemInitListener</listener-class>
+    </listener>
+
+
+    <!-- SpringMVC -->
+    <servlet>
+        <servlet-name>springMVC</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:spring/springMVC-servlet.xml</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>springMVC</servlet-name>
+        <url-pattern>*.html</url-pattern>
+    </servlet-mapping>
+
+    <!-- 编码 -->
+    <filter>
+        <filter-name>encodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- Log4J -->
+    <!-- <context-param>
+      <param-name>log4jConfigLocation</param-name>
+      <param-value>classpath:log4j.properties</param-value>
+    </context-param> -->
+    <context-param>
+        <param-name>log4jRefreshInterval</param-name>
+        <param-value>6000</param-value>
+    </context-param>
+
+
+    <listener>
+        <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+    </listener>
+
+
+    <listener>
+        <description>spring监听器</description>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <listener>
+        <description>Introspector缓存清除监听器</description>
+        <listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
+    </listener>
+    <listener>
+        <description>request监听器</description>
+        <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+    </listener>
+
+
+    <!-- 生成验证码 -->
+    <servlet>
+        <servlet-name>imageRandServlet</servlet-name>
+        <servlet-class>com.webDemo.utils.ImageRandServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>imageRandServlet</servlet-name>
+        <url-pattern>/servlet/checkcodeServlet</url-pattern>
+    </servlet-mapping>
+
+
+    <!-- Kaptcha 验证码 -->
+    <servlet>
+        <servlet-name>Kaptcha</servlet-name>
+        <servlet-class>
+            com.google.code.kaptcha.servlet.KaptchaServlet
+        </servlet-class>
+        <init-param>
+            <description>图片边框，合法值：yes , no</description>
+            <param-name>kaptcha.border</param-name>
+            <param-value>no</param-value>
+        </init-param>
+        <init-param>
+            <description>图片宽 200</description>
+            <param-name>kaptcha.image.width</param-name>
+            <param-value>100</param-value>
+        </init-param>
+        <init-param>
+            <description>图片高 50</description>
+            <param-name>kaptcha.image.height</param-name>
+            <param-value>30</param-value>
+        </init-param>
+        <init-param>
+            <description>文字间隔 2</description>
+            <param-name>kaptcha.textproducer.char.space</param-name>
+            <param-value>3</param-value>
+        </init-param>
+        <init-param>
+            <description>字体大小 40px.</description>
+            <param-name>kaptcha.textproducer.font.size</param-name>
+            <param-value>23</param-value>
+        </init-param>
+        <init-param>
+            <description>验证码长度 5</description>
+            <param-name>kaptcha.textproducer.char.length</param-name>
+            <param-value>4</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Kaptcha</servlet-name>
+        <url-pattern>/checkcode.html</url-pattern>
+    </servlet-mapping>
+
+
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
+</web-app>

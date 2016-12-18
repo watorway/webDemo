@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+		"http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+
+<!-- 工具配置文件（自动生成java类） -->
+
+<!-- D:\mybatis-generator-core-1.3.2\lib>java -jar mybatis-generator-core-1.3.2.jar 
+	-configfile generatorConfig_dev1.xml -overwrite -->
+
+<generatorConfiguration>
+	<!-- 设置mysql驱动路径 -->
+	<classPathEntry location="E:\WorkSpace\eclipse\mysql-connector-java-5.0.8-bin.jar" />
+	<!-- 此处指定生成针对MyBatis3的DAO -->
+	<context id="DB2Tables" targetRuntime="MyBatis3">
+
+		<commentGenerator>
+			<!-- 是否注释，false为注释 -->
+			<property name="suppressAllComments" value="true" />
+			<!-- 是用来除去时间信息的，这在配合类似subversion的代码管理工具时使用很有效，因为可以减少没有必要的注释迁入 -->
+			<property name="suppressDate" value="true" />
+		</commentGenerator>
+
+
+		<!-- jdbc连接信息 -->
+		<jdbcConnection 
+			driverClass="com.mysql.jdbc.Driver"
+			connectionURL="jdbc:mysql://localhost:3306/webDemo" 
+			userId="root"
+			password="root" />
+
+		<!-- 默认false，把JDBC DECIMAL 和 NUMERIC 类型解析为 Integer true，把JDBC DECIMAL 和 
+			NUMERIC 类型解析为java.math.BigDecimal -->
+		<javaTypeResolver>
+			<property name="forceBigDecimals" value="false" />
+		</javaTypeResolver>
+
+		<!-- 模型的生成信息，这里将指定这些Java model(VO)类的生成路径 -->
+		<javaModelGenerator targetPackage="com.webDemo.entity" targetProject="webDemo">
+			<property name="enableSubPackages" value="true" />
+			<property name="trimStrings" value="true" />
+		</javaModelGenerator>
+
+		<!-- mybatis 的sqlMapper XML文件的生成信息，包括生成路径等 -->
+		<sqlMapGenerator targetPackage="com.webDemo.mapping" targetProject="webDemo">
+			<!-- enableSubPackages:是否让schema作为包的后缀 -->
+			<property name="enableSubPackages" value="true" />
+			<!-- 从数据库返回的值被清理前后的空格 -->
+			<property name="trimStrings" value="true" />
+		</sqlMapGenerator>
+
+		<!-- 是应用接口的生成信息(DAO Interface) -->
+		<javaClientGenerator type="XMLMAPPER" targetPackage="com.webDemo.mapper" targetProject="webDemo">
+			<property name="enableSubPackages" value="true" />
+		</javaClientGenerator>
+
+
+
+
+
+		<!-- 创建pojo,xml and dao :start -->
+	
+		<!-- 用户表 -->
+		<!--
+		<table schema="" tableName="user" domainObjectName="User">
+			 <generatedKey column="menu_guid" sqlStatement="Mysql"/> 
+		</table>-->
+	
+		
+		<table  schema="imooc" tableName="user" domainObjectName="User"   
+			enableCountByExample="false" enableDeleteByExample="false" 
+			enableSelectByExample="false" enableUpdateByExample="false"></table>
+ 
+ 
+		
+		
+	</context>
+</generatorConfiguration>
